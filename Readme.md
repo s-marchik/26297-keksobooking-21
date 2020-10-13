@@ -1,7 +1,7 @@
 # Личный проект «Кексобукинг» [![Build status][travis-image]][travis-url]
 
 * Студент: [Сергей Марчик](https://up.htmlacademy.ru/javascript/21/user/26297).
-* Наставник: `Неизвестно`.
+* Наставник: Максим Деев.
 
 ---
 
