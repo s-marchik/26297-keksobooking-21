@@ -31,7 +31,6 @@ const getItemRandom = function (items) {
 let createRandomArr = function (items) {
   let arr = [];
   let i = 0;
-
   while (i < items.length) {
     arr[i] = items[getRandomInt(0, items.length)];
     i++;
@@ -68,19 +67,17 @@ const getAppartmentObject = function () {
 const mapPins = document.querySelector(`.map__pins`);
 const countObjectInArray = 8;
 
+const map = document.querySelector(`.map`);
+
 const getObjectsArray = function () {
-  let objectsArray = [];
+  let objArray = [];
   for (let i = 0; i < countObjectInArray; i++) {
-    objectsArray.push(getAppartmentObject());
+    objArray.push(getAppartmentObject());
   }
-  return objectsArray;
+  return objArray;
 };
 
 const objectsArray = getObjectsArray();
-
-const map = document.querySelector(`.map`);
-map.classList.remove(`map--faded`);
-
 
 const pinTemplate = document.querySelector(`#pin`).content.querySelector(`button`);
 const fragment = document.createDocumentFragment();
@@ -95,7 +92,23 @@ for (let i = 0; i < countObjectInArray; i++) {
   fragment.appendChild(clonedPin);
 }
 
-mapPins.appendChild(fragment);
+let showPins = function () {
+  mapPins.appendChild(fragment);
+  const mapPinsArray = document.querySelectorAll(`.map__pin`);
+
+  for (let i = 0; i <= countObjectInArray; i++) {
+    mapPinsArray[i].addEventListener(`click`, function () {
+      showCard(i);
+    });
+
+    mapPinsArray[i].addEventListener(`keydown`, function (evt) {
+      if (evt.key === `Enter`) {
+        showCard(i);
+      }
+    });
+  }
+};
+
 
 let createCard = function (items) {
   const cardElement = cardTemplate.cloneNode(true);
@@ -110,8 +123,9 @@ let createCard = function (items) {
   cardElement.querySelector(`.popup__avatar`).src = objectsArray[items].author.avatar;
 
   const cardPhotos = cardElement.querySelector(`.popup__photos`);
-  const cardPhotoImg = cardPhotos.querySelector(`.popup__photo`);
 
+  const cardPhotoImg = cardPhotos.querySelector(`.popup__photo`);
+  cardPhotos.innerHTML = ``;
   for (let i = 0; i < objectsArray[items].offer.photos.length; i++) {
     cardPhotos.appendChild(cardPhotoImg.cloneNode());
   }
@@ -134,15 +148,41 @@ let createCard = function (items) {
   return cardElement;
 };
 
-
 let extendCard = function (items) {
+  removeCard();
   const fragmentCard = document.createDocumentFragment();
-
   fragmentCard.appendChild(createCard(items));
   map.insertBefore(fragmentCard, mapFiltersContainer);
+
+  const cardCloseBtn = document.querySelector(`.popup__close`);
+
+  cardCloseBtn.addEventListener(`click`, function () {
+    removeCard();
+  });
+
+  document.addEventListener(`keydown`, function (evt) {
+    if (evt.key === `Escape`) {
+      removeCard();
+    }
+  });
+
+
 };
 
-extendCard(0);
+let showCard = function (item) {
+  if (item !== 0) {
+    extendCard(item - 1);
+  } else {
+    removeCard();
+  }
+};
+
+let removeCard = function () {
+  const mapCard = document.querySelector(`.map__card`);
+  if (mapCard) {
+    mapCard.remove();
+  }
+};
 
 const pinMain = document.querySelector(`.map__pin--main`);
 const MAP_PIN_WIDTH = 65;
@@ -179,37 +219,20 @@ const timeInInput = adForm.querySelector(`select[name=timein]`);
 const timeOutInput = adForm.querySelector(`select[name=timeout]`);
 const roomsInput = adForm.querySelector(`select[name=rooms]`);
 const capacityInput = adForm.querySelector(`select[name=capacity]`);
-const priceMinToType = {bungalow: 10, flat: 100, house: 1000, palace: 10000};
+const priceMinToType = {bungalow: 0, flat: 1000, house: 5000, palace: 10000};
 
-let getActive = function () {
+
+let showForm = function () {
   map.classList.remove(`map--faded`);
   adForm.classList.remove(`ad-form--disabled`);
 
   changeValue(adForm, true);
   changeValue(mapFilters, true);
-  adressInput.value = getAddressFromPinPosition((MAP_PIN_WIDTH / 2), MAP_PIN_HEIGHT);
-  typeInput.addEventListener(`change`, priceMinToTypeMatch);
-  timeInInput.addEventListener(`change`, timesInMatch);
-  timeOutInput.addEventListener(`change`, timesOutMatch);
-  titleInput.addEventListener(`input`, validateTitle);
-  priceInput.addEventListener(`input`, validatePrice);
-  roomsInput.addEventListener(`input`, roomsAndCapacityMatch);
-  capacityInput.addEventListener(`input`, roomsAndCapacityMatch);
-
 };
-
-pinMain.addEventListener(`mousedown`, getActive);
-
-pinMain.addEventListener(`keydown`, function (evt) {
-  if (evt.key === `Enter`) {
-    getActive();
-  }
-});
 
 let priceMinToTypeMatch = function () {
   priceInput.min = priceInput.placeholder = priceMinToType[typeInput.value];
 };
-
 
 let timesOutMatch = function () {
   timeInInput.value = timeOutInput.value;
@@ -239,18 +262,16 @@ let validateTitle = function () {
   } else {
     titleInput.setCustomValidity(``);
   }
-
   titleInput.reportValidity();
 };
 
-
 let roomsAndCapacityMatch = function () {
   if (+capacityInput.value === 0 && +roomsInput.value !== 100 || +capacityInput.value !== 0 && +roomsInput.value === 100) {
-    roomsInput.setCustomValidity(`Неправельное значение`);
-    capacityInput.setCustomValidity(`Неправельное значение`);
+    roomsInput.setCustomValidity(`Неправильное значение`);
+    capacityInput.setCustomValidity(`Неправильное значение`);
   } else if (+capacityInput.value > roomsInput.value) {
-    roomsInput.setCustomValidity(`Неправельное значение`);
-    capacityInput.setCustomValidity(`Неправельное значение`);
+    roomsInput.setCustomValidity(`Неправильное значение`);
+    capacityInput.setCustomValidity(`Неправильное значение`);
   } else {
     roomsInput.setCustomValidity(``);
     capacityInput.setCustomValidity(``);
@@ -259,3 +280,32 @@ let roomsAndCapacityMatch = function () {
   roomsInput.reportValidity();
   capacityInput.reportValidity();
 };
+
+
+adressInput.value = getAddressFromPinPosition((MAP_PIN_WIDTH / 2), MAP_PIN_HEIGHT);
+typeInput.addEventListener(`change`, priceMinToTypeMatch);
+timeInInput.addEventListener(`change`, timesInMatch);
+timeOutInput.addEventListener(`change`, timesOutMatch);
+titleInput.addEventListener(`input`, validateTitle);
+priceInput.addEventListener(`input`, validatePrice);
+roomsInput.addEventListener(`input`, roomsAndCapacityMatch);
+capacityInput.addEventListener(`input`, roomsAndCapacityMatch);
+
+let shownPins = 0;
+pinMain.addEventListener(`click`, function () {
+  showForm();
+  if (!shownPins) {
+    showPins();
+    shownPins = 1;
+  }
+});
+
+pinMain.addEventListener(`keydown`, function (evt) {
+  if (evt.key === `Enter`) {
+    showForm();
+    if (!shownPins) {
+      showPins();
+      shownPins = 1;
+    }
+  }
+});
