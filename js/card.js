@@ -3,7 +3,7 @@
 (function () {
   const mapFiltersContainer = document.querySelector(`.map__filters-container`);
   const cardTemplate = document.querySelector(`#card`).content.querySelector(`.map__card`);
-
+  const TYPE_HOUSE = {palace: `Дворец`, flat: `Квартира`, house: `Дом`, bungalow: `Бунгало`};
   const map = document.querySelector(`.map`);
 
 
@@ -20,7 +20,7 @@
       cardElement.querySelector(`.popup__title`).textContent = item.offer.title;
       cardElement.querySelector(`.popup__text--address`).textContent = item.offer.address;
       cardElement.querySelector(`.popup__text--price`).textContent = `${item.offer.price} ₽/ночь`;
-      cardElement.querySelector(`.popup__type`).textContent = window.data.getTypeHouse(item.offer.type);
+      cardElement.querySelector(`.popup__type`).textContent = window.card.getTypeHouse(item.offer.type);
       cardElement.querySelector(`.popup__text--capacity`).textContent = `${item.offer.rooms} комнаты для ${item.offer.guests} гостей`;
       cardElement.querySelector(`.popup__text--time`).textContent = `Заезд после ${item.offer.checkin}, выезд до ${item.offer.checkout}`;
       cardElement.querySelector(`.popup__description`).textContent = item.offer.description;
@@ -67,6 +67,10 @@
           window.card.removeCard();
         }
       });
+    },
+
+    getTypeHouse: (type) => {
+      return TYPE_HOUSE[type];
     }
   };
 })();
