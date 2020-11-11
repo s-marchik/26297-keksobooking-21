@@ -62,4 +62,8 @@
       }
     }
   });
+
+  pinMain.addEventListener(`mousedown`, function (evt) {
+    window.movement.movePinMain(evt);
+  });
 })();

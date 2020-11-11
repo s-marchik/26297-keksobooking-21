@@ -16,6 +16,22 @@
   const MAP_PIN_WIDTH = 65;
   const MAP_PIN_HEIGHT = 84;
 
+  const pinMain = document.querySelector(`.map__pin--main`);
+
+  window.form = {
+    showForm: () => {
+      map.classList.remove(`map--faded`);
+      adForm.classList.remove(`ad-form--disabled`);
+
+      changeValue(adForm, true);
+      changeValue(mapFilters, true);
+    },
+
+    getAddressFromPinPosition: (xPinPoint, yPinPoint) => {
+      adressInput.value = `${parseInt(parseInt(xPinPoint, 10) + MAP_PIN_WIDTH / 2, 10)}, ${parseInt(parseInt(yPinPoint, 10) + MAP_PIN_HEIGHT, 10)}`;
+    }
+  };
+
   let changeValue = function (form, ability) {
     const fieldsets = form.querySelectorAll(`fieldset`);
     const selects = form.querySelectorAll(`select`);
@@ -82,12 +98,8 @@
     roomsInput.reportValidity();
     capacityInput.reportValidity();
   };
-  const pinMain = document.querySelector(`.map__pin--main`);
-  let getAddressFromPinPosition = function (xPinPoint, yPinPoint) {
-    return `${parseInt(parseInt(pinMain.style.left, 10) + xPinPoint, 10)}, ${parseInt(parseInt(pinMain.style.top, 10) + yPinPoint, 10)}`;
-  };
 
-  adressInput.value = getAddressFromPinPosition((MAP_PIN_WIDTH / 2), MAP_PIN_HEIGHT);
+  window.form.getAddressFromPinPosition(pinMain.offsetLeft, pinMain.offsetTop);
   typeInput.addEventListener(`change`, priceMinToTypeMatch);
   timeInInput.addEventListener(`change`, timesInMatch);
   timeOutInput.addEventListener(`change`, timesOutMatch);
@@ -95,16 +107,6 @@
   priceInput.addEventListener(`input`, validatePrice);
   roomsInput.addEventListener(`input`, roomsAndCapacityMatch);
   capacityInput.addEventListener(`input`, roomsAndCapacityMatch);
-
-  window.form = {
-    showForm: () => {
-      map.classList.remove(`map--faded`);
-      adForm.classList.remove(`ad-form--disabled`);
-
-      changeValue(adForm, true);
-      changeValue(mapFilters, true);
-    }
-  };
 
 })();
 
