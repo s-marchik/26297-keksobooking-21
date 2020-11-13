@@ -5,41 +5,29 @@
   const mapPins = document.querySelector(`.map__pins`);
   const pinMain = document.querySelector(`.map__pin--main`);
   const fragment = document.createDocumentFragment();
-  const countObjectInArray = 8;
 
-  const objectsArray = window.data.getObjectsArray(countObjectInArray);
-
-  let drowPins = function () {
-    for (let i = 0; i < objectsArray.length; i++) {
+  let showPins = function (objectArray) {
+    for (let i = 0; i < objectArray.length; i++) {
       const clonedPin = pinTemplate.cloneNode(true);
-      clonedPin.style.left = objectsArray[i].location.x + `px`;
-      clonedPin.style.top = objectsArray[i].location.y + `px`;
+      clonedPin.style.left = objectArray[i].location.x + `px`;
+      clonedPin.style.top = objectArray[i].location.y + `px`;
       const picture = clonedPin.querySelector(`img`);
-      picture.src = objectsArray[i].author.avatar;
-      picture.alt = objectsArray[i].offer.description;
-      fragment.appendChild(clonedPin);
-    }
-  };
-
-  drowPins();
-
-  let showPins = function () {
-    mapPins.appendChild(fragment);
-    const mapPinsArray = document.querySelectorAll(`.map__pin`);
-
-    for (let i = 1; i <= mapPinsArray.length - 1; i++) {
-      mapPinsArray[i].addEventListener(`click`, function () {
+      picture.src = objectArray[i].author.avatar;
+      picture.alt = objectArray[i].offer.description;
+      clonedPin.addEventListener(`click`, function () {
         window.card.removeCard();
-        window.card.createCard(objectsArray[i - 1]);
+        window.card.createCard(objectArray[i]);
       });
 
-      mapPinsArray[i].addEventListener(`keydown`, function (evt) {
+      clonedPin.addEventListener(`keydown`, function (evt) {
         if (evt.key === `Enter`) {
           window.card.removeCard();
-          window.card.createCard(objectsArray[i - 1]);
+          window.card.createCard(objectArray[i]);
         }
       });
+      fragment.appendChild(clonedPin);
     }
+    mapPins.appendChild(fragment);
   };
 
   let shownPins = 0;
@@ -47,7 +35,7 @@
     window.card.removeCard();
     window.form.showForm();
     if (!shownPins) {
-      showPins();
+      window.load(showPins, window.util.errorHandler);
       shownPins = 1;
     }
   });
@@ -57,7 +45,7 @@
       window.card.removeCard();
       window.form.showForm();
       if (!shownPins) {
-        showPins();
+        window.load(showPins, window.util.errorHandler);
         shownPins = 1;
       }
     }
