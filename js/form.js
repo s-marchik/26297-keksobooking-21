@@ -11,26 +11,17 @@
   const roomsInput = adForm.querySelector(`select[name=rooms]`);
   const capacityInput = adForm.querySelector(`select[name=capacity]`);
   const priceMinToType = {bungalow: 0, flat: 1000, house: 5000, palace: 10000};
-  const map = document.querySelector(`.map`);
-  const mapFilters = document.querySelector(`.map__filters`);
+
   const MAP_PIN_WIDTH = 65;
   const MAP_PIN_HEIGHT = 84;
 
+  const map = document.querySelector(`.map`);
+  const mapFilters = document.querySelector(`.map__filters`);
   const pinMain = document.querySelector(`.map__pin--main`);
-
-  window.form = {
-    showForm: () => {
-      map.classList.remove(`map--faded`);
-      adForm.classList.remove(`ad-form--disabled`);
-
-      changeValue(adForm, true);
-      changeValue(mapFilters, true);
-    },
-
-    getAddressFromPinPosition: (xPinPoint, yPinPoint) => {
-      adressInput.value = `${parseInt(parseInt(xPinPoint, 10) + MAP_PIN_WIDTH / 2, 10)}, ${parseInt(parseInt(yPinPoint, 10) + MAP_PIN_HEIGHT, 10)}`;
-    }
-  };
+  const errorTemplate = document.querySelector(`#error`).content.querySelector(`.error`);
+  const successTemplate = document.querySelector(`#success`).content.querySelector(`.success`);
+  const main = document.querySelector(`main`);
+  const resetBtn = document.querySelector(`.ad-form__reset`);
 
   let changeValue = function (form, ability) {
     const fieldsets = form.querySelectorAll(`fieldset`);
@@ -48,8 +39,8 @@
   changeValue(adForm, false);
   changeValue(mapFilters, false);
 
-  let priceMinToTypeMatch = function () {
-    priceInput.min = priceInput.placeholder = priceMinToType[typeInput.value];
+  let priceMinToTypeMatch = function (i) {
+    priceInput.min = priceInput.placeholder = priceMinToType[i];
   };
 
   let timesOutMatch = function () {
@@ -99,14 +90,117 @@
     capacityInput.reportValidity();
   };
 
-  window.form.getAddressFromPinPosition(pinMain.offsetLeft, pinMain.offsetTop);
-  typeInput.addEventListener(`change`, priceMinToTypeMatch);
+  let resetPrice = function () {
+    priceMinToTypeMatch(`flat`);
+  };
+
+
+  typeInput.addEventListener(`change`, (event) => {
+    priceMinToTypeMatch(event.target.value);
+  });
   timeInInput.addEventListener(`change`, timesInMatch);
   timeOutInput.addEventListener(`change`, timesOutMatch);
   titleInput.addEventListener(`input`, validateTitle);
   priceInput.addEventListener(`input`, validatePrice);
   roomsInput.addEventListener(`input`, roomsAndCapacityMatch);
   capacityInput.addEventListener(`input`, roomsAndCapacityMatch);
+
+  const hideSuccessMessage = (evt) => {
+    evt.preventDefault();
+    const message = main.querySelector(`.success`);
+    main.removeChild(message);
+    document.removeEventListener(`click`, hideSuccessMessage);
+    document.removeEventListener(`keydown`, hideSuccessMessageByEsc);
+  };
+
+  const hideSuccessMessageByEsc = (evt) => {
+    if (evt.key === `Escape`) {
+      hideSuccessMessage(evt);
+    }
+  };
+
+  const setSuccessMessage = () => {
+    const successMessage = successTemplate.cloneNode(true);
+    main.appendChild(successMessage);
+
+    document.addEventListener(`click`, hideSuccessMessage);
+    document.addEventListener(`keydown`, hideSuccessMessageByEsc);
+    window.form.setDefForm();
+    window.pin.setDefPin();
+  };
+
+  const hideErrorMessage = (evt) => {
+    evt.preventDefault();
+    const message = main.querySelector(`.error`);
+    main.removeChild(message);
+    document.removeEventListener(`click`, hideErrorMessage);
+    document.removeEventListener(`keydown`, hideErrorMessageByEsc);
+  };
+
+  const hideErrorMessageByEsc = (evt) => {
+    if (evt.key === `Escape`) {
+      hideErrorMessage(evt);
+    }
+  };
+
+  const setErrorMessage = () => {
+    const errorMessage = errorTemplate.cloneNode(true);
+    main.appendChild(errorMessage);
+    document.addEventListener(`click`, hideErrorMessage);
+    document.addEventListener(`keydown`, hideErrorMessageByEsc);
+    const btnErr = document.querySelector(`.error__button`);
+    btnErr.addEventListener(`click`, hideErrorMessage);
+  };
+
+  adForm.addEventListener(`submit`, (evt) => {
+    window.upload(new FormData(adForm), () => {
+
+      window.pin.removePins();
+      window.card.removeCard();
+      adForm.reset();
+      resetPrice();
+      window.pin.resetPinMain();
+
+      setSuccessMessage();
+    }, setErrorMessage);
+    evt.preventDefault();
+  });
+
+  resetBtn.addEventListener(`click`, () => {
+    adForm.reset();
+    resetPrice();
+    window.pin.resetPinMain();
+  });
+
+  window.form = {
+    showForm: () => {
+      map.classList.remove(`map--faded`);
+      adForm.classList.remove(`ad-form--disabled`);
+      window.form.getAddressFromPinPosition(pinMain.offsetLeft, pinMain.offsetTop);
+
+      changeValue(adForm, true);
+      changeValue(mapFilters, true);
+    },
+
+    mainPinPosLeft: (x) => {
+      return parseInt(parseInt(x, 10) + MAP_PIN_WIDTH / 2, 10);
+    },
+
+    mainPinPosTop: (y) => {
+      return parseInt(parseInt(y, 10) + MAP_PIN_HEIGHT, 10);
+    },
+
+    getAddressFromPinPosition: (xPinPoint, yPinPoint) => {
+      adressInput.value = `${window.form.mainPinPosLeft(xPinPoint)}, ${window.form.mainPinPosTop(yPinPoint)}`;
+    },
+
+    setDefForm: () => {
+      map.classList.add(`map--faded`);
+      adForm.classList.add(`ad-form--disabled`);
+      changeValue(adForm, false);
+      changeValue(mapFilters, false);
+    }
+  };
 
 })();
 
