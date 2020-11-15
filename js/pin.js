@@ -8,37 +8,16 @@
   const map = document.querySelector(`.map`);
   const MAP_PIN_MAIN_DEF_POS_X = 570;
   const MAP_PIN_MAIN_DEF_POS_Y = 375;
-
-  let showPins = function (objectArray) {
-    for (let i = 0; i < objectArray.length; i++) {
-      const clonedPin = pinTemplate.cloneNode(true);
-      clonedPin.style.left = objectArray[i].location.x + `px`;
-      clonedPin.style.top = objectArray[i].location.y + `px`;
-      const picture = clonedPin.querySelector(`img`);
-      picture.src = objectArray[i].author.avatar;
-      picture.alt = objectArray[i].offer.description;
-      clonedPin.addEventListener(`click`, function () {
-        window.card.removeCard();
-        window.card.createCard(objectArray[i]);
-      });
-
-      clonedPin.addEventListener(`keydown`, function (evt) {
-        if (evt.key === `Enter`) {
-          window.card.removeCard();
-          window.card.createCard(objectArray[i]);
-        }
-      });
-      fragment.appendChild(clonedPin);
-    }
-    mapPins.appendChild(fragment);
-  };
-
+  const SHOW_PIN_COUNT = 5;
+  let showPinCount;
+  let loadedPins;
   let shownPins = 0;
+
   pinMain.addEventListener(`click`, function () {
     window.card.removeCard();
     window.form.showForm();
     if (!shownPins) {
-      window.load(showPins, window.util.errorHandler);
+      window.load(window.pin.showPins, window.util.errorHandler);
       shownPins = 1;
       pinMain.addEventListener(`mousedown`, window.movement.movePinMain);
     }
@@ -49,7 +28,7 @@
       window.card.removeCard();
       window.form.showForm();
       if (!shownPins) {
-        window.load(showPins, window.util.errorHandler);
+        window.load(window.pin.showPins, window.util.errorHandler);
         shownPins = 1;
         pinMain.addEventListener(`mousedown`, window.movement.movePinMain);
       }
@@ -57,6 +36,8 @@
   });
 
   window.pin = {
+    loadedPins,
+
     removePins: () => {
       const pins = document.querySelectorAll(`.map__pin`);
       pins.forEach(function (item) {
@@ -76,6 +57,32 @@
       map.classList.add(`map--faded`);
       pinMain.removeEventListener(`mousedown`, window.movement.movePinMain);
       shownPins = 0;
+    },
+
+    showPins: (objectArray) => {
+      showPinCount = SHOW_PIN_COUNT;
+      showPinCount = (objectArray.length < showPinCount) ? objectArray.length : showPinCount;
+      for (let i = 0; i < showPinCount; i++) {
+        const clonedPin = pinTemplate.cloneNode(true);
+        clonedPin.style.left = objectArray[i].location.x + `px`;
+        clonedPin.style.top = objectArray[i].location.y + `px`;
+        const picture = clonedPin.querySelector(`img`);
+        picture.src = objectArray[i].author.avatar;
+        picture.alt = objectArray[i].offer.description;
+        clonedPin.addEventListener(`click`, function () {
+          window.card.removeCard();
+          window.card.createCard(objectArray[i]);
+        });
+
+        clonedPin.addEventListener(`keydown`, function (evt) {
+          if (evt.key === `Enter`) {
+            window.card.removeCard();
+            window.card.createCard(objectArray[i]);
+          }
+        });
+        fragment.appendChild(clonedPin);
+      }
+      mapPins.appendChild(fragment);
     }
   };
 })();

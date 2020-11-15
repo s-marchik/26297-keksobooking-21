@@ -14,6 +14,7 @@
     xhr.addEventListener(`load`, () => {
       if (xhr.status === StatusCode.OK) {
         onSuccess(xhr.response);
+        window.pin.loadedPins = xhr.response;
       } else {
         onError(`Произошла ошибка: ${xhr.status}`);
       }
