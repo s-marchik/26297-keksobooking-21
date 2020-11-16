@@ -1,10 +1,9 @@
 'use strict';
 (() => {
   const URL = `https://21.javascript.pages.academy/keksobooking/data`;
-  const StatusCode = {
+  const STATUSE_CODE = {
     OK: 200
   };
-
   const TIMEOUT = 10000;
 
   window.load = (onSuccess, onError) => {
@@ -12,7 +11,7 @@
     xhr.responseType = `json`;
 
     xhr.addEventListener(`load`, () => {
-      if (xhr.status === StatusCode.OK) {
+      if (xhr.status === STATUSE_CODE.OK) {
         onSuccess(xhr.response);
         window.pin.loadedPins = xhr.response;
       } else {

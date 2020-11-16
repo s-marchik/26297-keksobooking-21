@@ -70,7 +70,7 @@
     return offersCopy;
   };
 
-  const isOfferIncludesFeatures = (offer) => {
+  const checkOfferIncludesFeatures = (offer) => {
     const checkedFeatures = Array.from(Filter.FEATURES.querySelectorAll(`.map__checkbox:checked`));
     const offerIncludesFeatures = checkedFeatures.every(function (checkedFeature) {
       const offerIncludesFeature = offer.offer.features.some(function (offerFeature) {
@@ -78,12 +78,11 @@
       });
       return offerIncludesFeature;
     });
-
     return offerIncludesFeatures;
   };
 
   const filterOffersFeatures = (offers) => {
-    const offersCopy = offers.filter(isOfferIncludesFeatures);
+    const offersCopy = offers.filter(checkOfferIncludesFeatures);
     return offersCopy;
   };
 
@@ -93,7 +92,6 @@
     filteredOffers = filterOffersRooms(filteredOffers);
     filteredOffers = filterOffersGuests(filteredOffers);
     filteredOffers = filterOffersFeatures(filteredOffers);
-
     return filteredOffers;
   };
 

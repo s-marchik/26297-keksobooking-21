@@ -3,9 +3,13 @@
 (function () {
   const mapFiltersContainer = document.querySelector(`.map__filters-container`);
   const cardTemplate = document.querySelector(`#card`).content.querySelector(`.map__card`);
-  const TYPE_HOUSE = {palace: `Дворец`, flat: `Квартира`, house: `Дом`, bungalow: `Бунгало`};
+  const HouseType = {
+    palace: `Дворец`,
+    flat: `Квартира`,
+    house: `Дом`,
+    bungalow: `Бунгало`
+  };
   const map = document.querySelector(`.map`);
-
 
   window.card = {
     removeCard: () => {
@@ -70,7 +74,7 @@
     },
 
     getTypeHouse: (type) => {
-      return TYPE_HOUSE[type];
+      return HouseType[type];
     }
   };
 })();

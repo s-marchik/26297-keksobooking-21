@@ -29,7 +29,6 @@
         const locationOfpinMainX = (pinMain.offsetLeft - shift.x) + MAP_PIN_WIDTH / 2;
 
         if ((locationOfpinMainX >= 0 && locationOfpinMainX < document.querySelector(`.map`).offsetWidth) && (locationOfpinMainY >= 130 && locationOfpinMainY <= 630)) {
-
           pinMain.style.left = `${pinMain.offsetLeft - shift.x}px`;
           pinMain.style.top = `${pinMain.offsetTop - shift.y}px`;
           window.form.getAddressFromPinPosition(pinMain.offsetLeft - shift.x, pinMain.offsetTop - shift.y);

@@ -10,18 +10,22 @@
   const timeOutInput = adForm.querySelector(`select[name=timeout]`);
   const roomsInput = adForm.querySelector(`select[name=rooms]`);
   const capacityInput = adForm.querySelector(`select[name=capacity]`);
-  const priceMinToType = {bungalow: 0, flat: 1000, house: 5000, palace: 10000};
-
-  const MAP_PIN_WIDTH = 65;
-  const MAP_PIN_HEIGHT = 84;
-
+  const main = document.querySelector(`main`);
   const map = document.querySelector(`.map`);
   const mapFilters = document.querySelector(`.map__filters`);
   const pinMain = document.querySelector(`.map__pin--main`);
   const errorTemplate = document.querySelector(`#error`).content.querySelector(`.error`);
   const successTemplate = document.querySelector(`#success`).content.querySelector(`.success`);
-  const main = document.querySelector(`main`);
   const resetBtn = document.querySelector(`.ad-form__reset`);
+
+  const PriceMinByType = {
+    bungalow: 0,
+    flat: 1000,
+    house: 5000,
+    palace: 10000
+  };
+  const MAP_PIN_WIDTH = 65;
+  const MAP_PIN_HEIGHT = 84;
 
   let changeValue = function (form, ability) {
     const fieldsets = form.querySelectorAll(`fieldset`);
@@ -39,15 +43,15 @@
   changeValue(adForm, false);
   changeValue(mapFilters, false);
 
-  let priceMinToTypeMatch = function (i) {
-    priceInput.min = priceInput.placeholder = priceMinToType[i];
+  let matchPriceMinToType = function (i) {
+    priceInput.min = priceInput.placeholder = PriceMinByType[i];
   };
 
-  let timesOutMatch = function () {
+  let matchTimeOut = function () {
     timeInInput.value = timeOutInput.value;
   };
 
-  let timesInMatch = function () {
+  let matchTimeIn = function () {
     timeOutInput.value = timeInInput.value;
   };
 
@@ -74,7 +78,7 @@
     titleInput.reportValidity();
   };
 
-  let roomsAndCapacityMatch = function () {
+  let matchRoomsAndCapacity = function () {
     if (+capacityInput.value === 0 && +roomsInput.value !== 100 || +capacityInput.value !== 0 && +roomsInput.value === 100) {
       roomsInput.setCustomValidity(`Неправильное значение`);
       capacityInput.setCustomValidity(`Неправильное значение`);
@@ -91,19 +95,18 @@
   };
 
   let resetPrice = function () {
-    priceMinToTypeMatch(`flat`);
+    matchPriceMinToType(`flat`);
   };
 
-
   typeInput.addEventListener(`change`, (event) => {
-    priceMinToTypeMatch(event.target.value);
+    matchPriceMinToType(event.target.value);
   });
-  timeInInput.addEventListener(`change`, timesInMatch);
-  timeOutInput.addEventListener(`change`, timesOutMatch);
+  timeInInput.addEventListener(`change`, matchTimeIn);
+  timeOutInput.addEventListener(`change`, matchTimeOut);
   titleInput.addEventListener(`input`, validateTitle);
   priceInput.addEventListener(`input`, validatePrice);
-  roomsInput.addEventListener(`input`, roomsAndCapacityMatch);
-  capacityInput.addEventListener(`input`, roomsAndCapacityMatch);
+  roomsInput.addEventListener(`input`, matchRoomsAndCapacity);
+  capacityInput.addEventListener(`input`, matchRoomsAndCapacity);
 
   const hideSuccessMessage = (evt) => {
     evt.preventDefault();
@@ -122,7 +125,6 @@
   const setSuccessMessage = () => {
     const successMessage = successTemplate.cloneNode(true);
     main.appendChild(successMessage);
-
     document.addEventListener(`click`, hideSuccessMessage);
     document.addEventListener(`keydown`, hideSuccessMessageByEsc);
     window.form.setDefForm();
@@ -154,13 +156,11 @@
 
   adForm.addEventListener(`submit`, (evt) => {
     window.upload(new FormData(adForm), () => {
-
       window.pin.removePins();
       window.card.removeCard();
       adForm.reset();
       resetPrice();
       window.pin.resetPinMain();
-
       setSuccessMessage();
     }, setErrorMessage);
     evt.preventDefault();
@@ -177,21 +177,20 @@
       map.classList.remove(`map--faded`);
       adForm.classList.remove(`ad-form--disabled`);
       window.form.getAddressFromPinPosition(pinMain.offsetLeft, pinMain.offsetTop);
-
       changeValue(adForm, true);
       changeValue(mapFilters, true);
     },
 
-    mainPinPosLeft: (x) => {
+    getMainPinPosLeft: (x) => {
       return parseInt(parseInt(x, 10) + MAP_PIN_WIDTH / 2, 10);
     },
 
-    mainPinPosTop: (y) => {
+    getMainPinPosTop: (y) => {
       return parseInt(parseInt(y, 10) + MAP_PIN_HEIGHT, 10);
     },
 
     getAddressFromPinPosition: (xPinPoint, yPinPoint) => {
-      adressInput.value = `${window.form.mainPinPosLeft(xPinPoint)}, ${window.form.mainPinPosTop(yPinPoint)}`;
+      adressInput.value = `${window.form.getMainPinPosLeft(xPinPoint)}, ${window.form.getMainPinPosTop(yPinPoint)}`;
     },
 
     setDefForm: () => {
@@ -201,6 +200,5 @@
       changeValue(mapFilters, false);
     }
   };
-
 })();
 
