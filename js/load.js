@@ -1,14 +1,17 @@
 'use strict';
 (() => {
-  const URL = `https://21.javascript.pages.academy/keksobooking/data`;
+  const URL_GET_DATA = `https://21.javascript.pages.academy/keksobooking/data`;
+  const URL_SEND_DATA = `https://21.javascript.pages.academy/keksobooking/`;
   const STATUSE_CODE = {
     OK: 200
   };
   const TIMEOUT = 10000;
 
-  window.load = (onSuccess, onError) => {
+
+  let sendRequest = function (onSuccess, onError) {
     const xhr = new XMLHttpRequest();
     xhr.responseType = `json`;
+    xhr.timeout = TIMEOUT;
 
     xhr.addEventListener(`load`, () => {
       if (xhr.status === STATUSE_CODE.OK) {
@@ -27,8 +30,21 @@
       onError(`Превышено вермя ожидания (${xhr.timeout}мс)`);
     });
 
-    xhr.timeout = TIMEOUT;
-    xhr.open(`GET`, URL);
-    xhr.send();
+    return xhr;
+  };
+
+
+  window.load = {
+    getData: (onSuccess, onError) => {
+      let xhr = sendRequest(onSuccess, onError);
+      xhr.open(`GET`, URL_GET_DATA);
+      xhr.send();
+    },
+
+    sendData: (data, onSuccess, onError) => {
+      let xhr = sendRequest(onSuccess, onError);
+      xhr.open(`POST`, URL_SEND_DATA);
+      xhr.send(data);
+    }
   };
 })();

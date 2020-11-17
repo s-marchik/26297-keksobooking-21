@@ -1,8 +1,13 @@
 'use strict';
 
 (function () {
+  const MAP_PIN_WIDTH = 65;
+  const MAP_PIN_HEIGHT = 84;
+  const MAP_PIN_MAIN_DEF_POS_X = 570;
+  const MAP_PIN_MAIN_DEF_POS_Y = 375;
+
   const adForm = document.querySelector(`.ad-form`);
-  const adressInput = adForm.querySelector(`input[name=address]`);
+  const addressInput = adForm.querySelector(`input[name=address]`);
   const titleInput = adForm.querySelector(`input[name=title]`);
   const priceInput = adForm.querySelector(`input[name=price]`);
   const typeInput = adForm.querySelector(`select[name=type]`);
@@ -24,8 +29,6 @@
     house: 5000,
     palace: 10000
   };
-  const MAP_PIN_WIDTH = 65;
-  const MAP_PIN_HEIGHT = 84;
 
   let changeValue = function (form, ability) {
     const fieldsets = form.querySelectorAll(`fieldset`);
@@ -39,9 +42,6 @@
       select.disabled = !ability;
     }
   };
-
-  changeValue(adForm, false);
-  changeValue(mapFilters, false);
 
   let matchPriceMinToType = function (i) {
     priceInput.min = priceInput.placeholder = PriceMinByType[i];
@@ -98,6 +98,10 @@
     matchPriceMinToType(`flat`);
   };
 
+  let resetRoomCapacity = function () {
+    capacityInput.value = 1;
+  };
+
   typeInput.addEventListener(`change`, (event) => {
     matchPriceMinToType(event.target.value);
   });
@@ -128,7 +132,7 @@
     document.addEventListener(`click`, hideSuccessMessage);
     document.addEventListener(`keydown`, hideSuccessMessageByEsc);
     window.form.setDefForm();
-    window.pin.setDefPin();
+    window.pin.resetPinMain();
   };
 
   const hideErrorMessage = (evt) => {
@@ -155,7 +159,7 @@
   };
 
   adForm.addEventListener(`submit`, (evt) => {
-    window.upload(new FormData(adForm), () => {
+    window.load.sendData(new FormData(adForm), () => {
       window.pin.removePins();
       window.card.removeCard();
       adForm.reset();
@@ -168,15 +172,16 @@
 
   resetBtn.addEventListener(`click`, () => {
     adForm.reset();
-    resetPrice();
+    mapFilters.reset();
     window.pin.resetPinMain();
+    window.form.setDefForm();
   });
 
   window.form = {
     showForm: () => {
       map.classList.remove(`map--faded`);
       adForm.classList.remove(`ad-form--disabled`);
-      window.form.getAddressFromPinPosition(pinMain.offsetLeft, pinMain.offsetTop);
+      window.form.setAddressFromPinPosition(pinMain.offsetLeft, pinMain.offsetTop);
       changeValue(adForm, true);
       changeValue(mapFilters, true);
     },
@@ -189,8 +194,8 @@
       return parseInt(parseInt(y, 10) + MAP_PIN_HEIGHT, 10);
     },
 
-    getAddressFromPinPosition: (xPinPoint, yPinPoint) => {
-      adressInput.value = `${window.form.getMainPinPosLeft(xPinPoint)}, ${window.form.getMainPinPosTop(yPinPoint)}`;
+    setAddressFromPinPosition: (xPinPoint, yPinPoint) => {
+      addressInput.value = `${window.form.getMainPinPosLeft(xPinPoint)}, ${window.form.getMainPinPosTop(yPinPoint)}`;
     },
 
     setDefForm: () => {
@@ -198,7 +203,12 @@
       adForm.classList.add(`ad-form--disabled`);
       changeValue(adForm, false);
       changeValue(mapFilters, false);
+      resetPrice();
+      resetRoomCapacity();
+      window.form.setAddressFromPinPosition(MAP_PIN_MAIN_DEF_POS_X, MAP_PIN_MAIN_DEF_POS_Y);
     }
   };
-})();
 
+  window.form.setDefForm();
+
+})();

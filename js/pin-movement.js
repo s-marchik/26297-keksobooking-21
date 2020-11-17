@@ -1,9 +1,10 @@
 'use strict';
 
 (function () {
-  const pinMain = document.querySelector(`.map__pin--main`);
   const MAP_PIN_WIDTH = 65;
   const MAP_PIN_HEIGHT = 84;
+
+  const pinMain = document.querySelector(`.map__pin--main`);
 
   window.movement = {
     movePinMain: (evt) => {
@@ -31,12 +32,12 @@
         if ((locationOfpinMainX >= 0 && locationOfpinMainX < document.querySelector(`.map`).offsetWidth) && (locationOfpinMainY >= 130 && locationOfpinMainY <= 630)) {
           pinMain.style.left = `${pinMain.offsetLeft - shift.x}px`;
           pinMain.style.top = `${pinMain.offsetTop - shift.y}px`;
-          window.form.getAddressFromPinPosition(pinMain.offsetLeft - shift.x, pinMain.offsetTop - shift.y);
+          window.form.setAddressFromPinPosition(pinMain.offsetLeft - shift.x, pinMain.offsetTop - shift.y);
         }
       };
 
       const onMouseUp = function () {
-        window.form.getAddressFromPinPosition(pinMain.offsetLeft, pinMain.offsetTop);
+        window.form.setAddressFromPinPosition(pinMain.offsetLeft, pinMain.offsetTop);
         document.removeEventListener(`mousemove`, onMouseMove);
         document.removeEventListener(`mouseup`, onMouseUp);
       };

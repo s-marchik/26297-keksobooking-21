@@ -1,15 +1,15 @@
 'use strict';
 
 (function () {
+  const MAP_PIN_MAIN_DEF_POS_X = 570;
+  const MAP_PIN_MAIN_DEF_POS_Y = 375;
+  const SHOW_PIN_COUNT = 5;
+
   const pinTemplate = document.querySelector(`#pin`).content.querySelector(`button`);
   const mapPins = document.querySelector(`.map__pins`);
   const pinMain = document.querySelector(`.map__pin--main`);
   const fragment = document.createDocumentFragment();
   const map = document.querySelector(`.map`);
-
-  const MAP_PIN_MAIN_DEF_POS_X = 570;
-  const MAP_PIN_MAIN_DEF_POS_Y = 375;
-  const SHOW_PIN_COUNT = 5;
 
   let loadedPins;
   let isShownPins = 0;
@@ -18,8 +18,7 @@
     window.card.removeCard();
     window.form.showForm();
     if (!isShownPins) {
-      window.load(window.pin.showPins, window.util.errorHandler);
-      isShownPins = 1;
+      window.pin.loadPins();
       pinMain.addEventListener(`mousedown`, window.movement.movePinMain);
     }
   });
@@ -29,8 +28,7 @@
       window.card.removeCard();
       window.form.showForm();
       if (!isShownPins) {
-        window.load(window.pin.showPins, window.util.errorHandler);
-        isShownPins = 1;
+        window.pin.loadPins();
         pinMain.addEventListener(`mousedown`, window.movement.movePinMain);
       }
     }
@@ -51,12 +49,10 @@
     resetPinMain: () => {
       pinMain.style.left = `${MAP_PIN_MAIN_DEF_POS_X}px`;
       pinMain.style.top = `${MAP_PIN_MAIN_DEF_POS_Y}px`;
-    },
-
-    setDefPin: () => {
-      window.pin.removePins();
-      map.classList.add(`map--faded`);
       pinMain.removeEventListener(`mousedown`, window.movement.movePinMain);
+      window.pin.removePins();
+      window.card.removeCard();
+      map.classList.add(`map--faded`);
       isShownPins = 0;
     },
 
@@ -81,6 +77,11 @@
         fragment.appendChild(clonedPin);
       }
       mapPins.appendChild(fragment);
+    },
+
+    loadPins: () => {
+      window.load.getData(window.pin.showPins, window.util.errorHandler);
+      isShownPins = 1;
     }
   };
 })();

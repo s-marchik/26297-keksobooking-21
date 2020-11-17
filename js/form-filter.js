@@ -20,10 +20,9 @@
     if (Filter.TYPE.value === DEF_VALUE) {
       return offers;
     }
-    const offersCopy = offers.filter(function (element) {
+    return offers.filter(function (element) {
       return element.offer.type === Filter.TYPE.value;
     });
-    return offersCopy;
   };
 
   const filterOffersPrice = (offers) => {
@@ -54,36 +53,31 @@
     if (Filter.ROOMS.value === DEF_VALUE) {
       return offers;
     }
-    const offersCopy = offers.filter(function (element) {
+    return offers.filter(function (element) {
       return element.offer.rooms === parseInt(Filter.ROOMS.value, 10);
     });
-    return offersCopy;
   };
 
   const filterOffersGuests = (offers) => {
     if (Filter.GUESTS.value === DEF_VALUE) {
       return offers;
     }
-    const offersCopy = offers.filter(function (element) {
+    return offers.filter(function (element) {
       return element.offer.guests === parseInt(Filter.GUESTS.value, 10);
     });
-    return offersCopy;
   };
 
   const checkOfferIncludesFeatures = (offer) => {
     const checkedFeatures = Array.from(Filter.FEATURES.querySelectorAll(`.map__checkbox:checked`));
-    const offerIncludesFeatures = checkedFeatures.every(function (checkedFeature) {
-      const offerIncludesFeature = offer.offer.features.some(function (offerFeature) {
+    return checkedFeatures.every(function (checkedFeature) {
+      return offer.offer.features.some(function (offerFeature) {
         return checkedFeature.value === offerFeature;
       });
-      return offerIncludesFeature;
     });
-    return offerIncludesFeatures;
   };
 
   const filterOffersFeatures = (offers) => {
-    const offersCopy = offers.filter(checkOfferIncludesFeatures);
-    return offersCopy;
+    return offers.filter(checkOfferIncludesFeatures);
   };
 
   const filterOffers = (offers) => {
@@ -98,7 +92,6 @@
   formFilter.addEventListener(`change`, function () {
     window.card.removeCard();
     window.pin.removePins();
-    filterOffers(window.pin.loadedPins);
     window.pin.showPins(filterOffers(window.pin.loadedPins));
   });
 })();
